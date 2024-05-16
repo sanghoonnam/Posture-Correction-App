@@ -29,4 +29,4 @@ pip install -r requirements.txt
 ### Turtleneck Detection
 ![image](https://user-images.githubusercontent.com/82289435/175851515-df9f350c-fe13-4a6b-8c74-614c065e3ea7.png)
 ### mac_notify Notification
-![image](/Users/yusanghoon/Desktop/Pose/Holistic/expression_image/1.png)
+![image](/Holistic/expression_image/1.png)
