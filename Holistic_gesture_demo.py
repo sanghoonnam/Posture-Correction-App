@@ -12,6 +12,7 @@ from modules.fps import fps_present
 # video input 
 cap = cv2.VideoCapture(0) # Must change the number for different devices
 
+
 folderPath = "expression_image"
 myList = os.listdir(folderPath)
 overlayList = []
