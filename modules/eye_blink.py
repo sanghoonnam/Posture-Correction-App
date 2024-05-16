@@ -1,4 +1,5 @@
-from win10toast import ToastNotifier
+# from win10toast import ToastNotifier
+from cptools.notify import mac_notify # 맥북용 알림
 import math
 
 
@@ -9,7 +10,7 @@ eye_blinker = 300
 def eyeblink_detection(detector, img, sensitivity, log=False, notification=True):
 
     # toast 알림을 주는 객체 생성
-    eyeblink_toaster = ToastNotifier()
+    # eyeblink_toaster = ToastNotifier()
 
     global eye_blink_count
     global eye_blinker
@@ -37,7 +38,9 @@ def eyeblink_detection(detector, img, sensitivity, log=False, notification=True)
     eye_blinker -= 1
     if eye_blinker < 0:
         if notification:
-            eyeblink_toaster.show_toast("Dry eyes WARNING", f" \nPlease blink your eyes.\n")
+            # eyeblink_toaster.show_toast("Dry eyes WARNING", f" \nPlease blink your eyes.\n")
+            mac_notify(title='안구 건조증이 걱정됩니다', text='눈을 깜빡여 주세요!!')
+
         eye_blinker = 300
 
     if log:

@@ -1,4 +1,5 @@
-from win10toast import ToastNotifier
+# from win10toast import ToastNotifier
+from cptools.notify import mac_notify # 맥북용 알림
 import math
 
 sleep_count = 0
@@ -8,7 +9,7 @@ def sleepiness_detection(detector, img, log=False, notification=True):
     global sleep_count
 
     # toast 알림을 주는 객체 생성
-    sleep_detection_toaster = ToastNotifier()
+    # sleep_detection_toaster = ToastNotifier()
     
     face_lmList = detector.findFaceLandmark(img, draw=False)
 
@@ -36,9 +37,11 @@ def sleepiness_detection(detector, img, log=False, notification=True):
         sleep_count = 0
 
     
-    if sleep_count > 200:
+    if sleep_count > 100:
         if notification:
-            sleep_detection_toaster.show_toast("Sleepiness WARNING", f" \nPlease Stretch your body.\n")
+            # sleep_detection_toaster.show_toast("Sleepiness WARNING", f" \nPlease Stretch your body.\n")
+            mac_notify(title='당신은 졸고 있습니다', text='스트레칭을 진행해주세요!!')
+
         print("[ Sleepiness WARNING ] - Please Stretch your body")
         sleep_count = 0
 

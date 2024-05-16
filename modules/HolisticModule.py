@@ -46,7 +46,7 @@ class HolisticDetector():
         if self.results.pose_landmarks:
             
             if draw:
-                 # Draw pose, left and right hands, and face landmarks on the image.
+                # Draw pose, left and right hands, and face landmarks on the image.
                 annotated_image = img.copy()
 
                 # self.mpDraw.draw_landmarks(
@@ -77,6 +77,7 @@ class HolisticDetector():
             for id, lm in enumerate(myHolistic.landmark):
                 # print(id,lm)
                 h, w, c = img.shape
+                # print(h,w) # 720*1280
                 cx, cy, cz = int(lm.x*w), int(lm.y*h), int(lm.z*(w+h)/2)
                 # print(id, cx, cy)
                 # print(cz)
@@ -117,9 +118,8 @@ class HolisticDetector():
             for id, lm in enumerate(myHolistic.landmark):
                 # print(id,lm)
                 h, w, c = img.shape
-                cx, cy, cz = int(lm.x*w), int(lm.y*h), int(lm.z*(w+h)/2)
-                # print(id, cx, cy)
-                # print(cz)
+                cx, cy, cz = int(lm.x*w), int(lm.y*h), int(lm.z*(w+h)/2) # x:width, y:height, z:depth
+                # print(id, cx, cy, cz)
                 xList.append(cx)
                 yList.append(cy)
                 self.left_hand_lmList.append([id, cx, cy, cz])

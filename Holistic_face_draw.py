@@ -1,5 +1,6 @@
 import cv2
-from win10toast import ToastNotifier
+# from win10toast import ToastNotifier
+from cptools.notify import mac_notify # 맥북용 알림
 
 import modules.HolisticModule as hm
 from modules.fps import fps_present
@@ -8,7 +9,7 @@ import numpy as np
 
 
 # video input 
-cap = cv2.VideoCapture(0, cv2.CAP_DSHOW)
+cap = cv2.VideoCapture(0)
 
 canvas = np.zeros((int(cap.get(4)), int(cap.get(3)), 3), np.uint8)
 

@@ -1,5 +1,6 @@
 import cv2
-from win10toast import ToastNotifier
+# from win10toast import ToastNotifier # alarm for window
+from cptools.notify import mac_notify # alarm for mac
 import os
 import math
 import modules.HolisticModule as hm
@@ -9,7 +10,7 @@ from modules.fps import fps_present
 
 
 # video input 
-cap = cv2.VideoCapture(0, cv2.CAP_DSHOW)
+cap = cv2.VideoCapture(0) # Must change the number for different devices
 
 folderPath = "expression_image"
 myList = os.listdir(folderPath)

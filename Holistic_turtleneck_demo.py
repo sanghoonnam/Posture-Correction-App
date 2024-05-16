@@ -1,8 +1,10 @@
 import cv2
 import time
 import modules.HolisticModule as hm
-from win10toast import ToastNotifier
+# from win10toast import ToastNotifier # 윈도우용 알림
+from cptools.notify import mac_notify # 맥북용 알림
 import math
+import numpy as np
 
 ###################################################
 sensitivity = 8
@@ -14,17 +16,21 @@ pTime = 0
 cTime = 0
 
 # video input 
-cap = cv2.VideoCapture(0, cv2.CAP_DSHOW)
+# cap = cv2.VideoCapture(-1, cv2.CAP_ANY)
+cap = cv2.VideoCapture(0)
 
 # Holistic 객체(어떠한 행위를 하는 친구) 생성
 detector = hm.HolisticDetector()
 
 # toast 알림을 주는 객체 생성
-toaster = ToastNotifier()
+# toaster = ToastNotifier()
 
 # turtle_neck_count 변수 초기 세팅
 turtle_neck_count = 0
 
+# 목 길이 저장하는 array
+len_arr=np.array([])
+init_len=0
 
 while True:
     # defalut BGR img
@@ -37,7 +43,6 @@ while True:
     pose_lmList = detector.findPoseLandmark(img, draw=True)
     # 468개의 얼굴 점 리스트
     face_lmList = detector.findFaceLandmark(img, draw=True)
-    
 
     # 인체가 감지가 되었는지 확인하는 구문
     if len(pose_lmList) != 0 and len(face_lmList) != 0:
@@ -52,8 +57,13 @@ while True:
         # 목 길이가 표시된 이미지로 변경
         length, img = detector.findDistance(152, center_shoulder, img, draw=True)
 
+        len_arr = np.append(len_arr,length)
+        if len_arr.shape[0]>10:
+            init_len = len_arr[-10:].mean()
+
         # x, y, z좌표 예측 (노트북 웹캠과의 거리를 대강 예측) - 노트북과의 거리
         pose_depth = abs(500 - detector.findDepth(11,12)) 
+        # print(detector.findDepth(11,12))
         # if pose_depth < 200:
         #     turtleneck_detect_threshold = 55
         # else:
@@ -67,22 +77,30 @@ while True:
         # 노트북과의 거리가 아주 가까운 상태
         else:
             turtleneck_detect_threshold = 50
+        
+        # 핵심 로직 목 길이가 임계치보다 작을 때, 거북목으로 생각한다.
+        if length < init_len*0.9:
+            turtle_neck_count += 1
         # 목길이, 임계치, 노트북과의 거리
-        print("Length : {:.3f},   Threshold : {:.3f},   Pose_depth : {}".format(length, turtleneck_detect_threshold, pose_depth))
+        print("Length : {:.3f},   Mean of length : {:.3f}, Turtle neck count : {:.3f}".format(length, init_len, turtle_neck_count))
     
 
         # 핵심 로직 목 길이가 임계치보다 작을 때, 거북목으로 생각한다.
-        if length < turtleneck_detect_threshold:
-            turtle_neck_count += 1
+        # if length < turtleneck_detect_threshold:
+        #     turtle_neck_count += 1
 
-        # 100번 거북목으로 인식되면 알림을 제공한다. 
-        if length < turtleneck_detect_threshold and turtle_neck_count > 100:
+        # 10번 거북목으로 인식되면 알림을 제공한다. 
+        # if length < turtleneck_detect_threshold and turtle_neck_count > 10:
+        if length < init_len*0.9 and turtle_neck_count > 10:
             # 얼마나 거북목인지 계산해주는 부분 (0~ 100 점) 
-            tutleneck_score = int((turtleneck_detect_threshold - int(length))/turtleneck_detect_threshold*100)
+            # tutleneck_score = int((turtleneck_detect_threshold - int(length))/turtleneck_detect_threshold*100)
+            turtleneck_score = int((init_len - int(length))/init_len*100)
             print("WARNING - Keep your posture straight.")
-            print("TurtleNeck Score = ", tutleneck_score)
+            print(f"TurtleNeck Score = {turtleneck_score}",)
             # win10toast 알림 제공
-            toaster.show_toast("TurtleNect WARNING", f"Keep your posture straight.\n\nDegree Of TurtleNeck = {tutleneck_score}")
+            print("TurtleNect WARNING", f"Keep your posture straight.\n\nDegree Of TurtleNeck = {turtleneck_score}")
+            mac_notify(title='당신은 거북목입니다', text='자세를 고쳐주세요!!!')
+            # toaster.show_toast("TurtleNect WARNING", f"Keep your posture straight.\n\nDegree Of TurtleNeck = {tutleneck_score}")
             # 알림 제공 후 카운트를 다시 0으로 만든다.
             turtle_neck_count = 0
 

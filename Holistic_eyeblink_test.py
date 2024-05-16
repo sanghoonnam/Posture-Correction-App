@@ -1,5 +1,6 @@
 import cv2
-from win10toast import ToastNotifier
+# from win10toast import ToastNotifier
+from cptools.notify import mac_notify # 맥북용 알림
 
 import modules.HolisticModule as hm
 from modules.turtle_neck import turtlenect_detection
@@ -8,7 +9,7 @@ from modules.fps import fps_present
 
 
 # video input 
-cap = cv2.VideoCapture(0, cv2.CAP_DSHOW)
+cap = cv2.VideoCapture(0)
 
 # Holistic 객체(어떠한 행위를 하는 친구) 생성
 detector = hm.HolisticDetector()

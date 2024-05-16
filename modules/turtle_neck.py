@@ -1,4 +1,5 @@
-from win10toast import ToastNotifier
+# from win10toast import ToastNotifier
+from cptools.notify import mac_notify # 맥북용 알림
 import math
 
 turtle_neck_count = 0
@@ -10,7 +11,7 @@ def turtlenect_detection(detector, img, sensitivity, log=False, notification=Tru
     global face_lmList
 
     # toast 알림을 주는 객체 생성
-    turtleneck_toaster = ToastNotifier()
+    # turtleneck_toaster = ToastNotifier()
 
     # 양 어깨 좌표 11번과 12번의 중심 좌표를 찾아 낸다.
     center_shoulder = detector.findCenter(11,12)
@@ -51,7 +52,8 @@ def turtlenect_detection(detector, img, sensitivity, log=False, notification=Tru
 
         if notification:
             # win10toast 알림 제공
-            turtleneck_toaster.show_toast("TurtleNect WARNING", f"Keep your posture straight.\n\nDegree Of TurtleNeck = {tutleneck_score}")
+            # turtleneck_toaster.show_toast("TurtleNect WARNING", f"Keep your posture straight.\n\nDegree Of TurtleNeck = {tutleneck_score}")
+            mac_notify(title='당신은 거북목입니다', text='자세를 고쳐주세요!!!')
         # 알림 제공 후 카운트를 다시 0으로 만든다.
         turtle_neck_count = 0
 
