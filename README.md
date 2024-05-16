@@ -29,4 +29,4 @@ pip install -r requirements.txt
 ### Turtleneck Detection
 ![image](https://github.com/sanghoonnam/Prevent-Turtle-neck/assets/102405778/0f895390-ae86-47fc-aafc-af9bf4177b33)
 ### mac_notify Notification
-![image]()
+![image](https://github.com/sanghoonnam/Prevent-Turtle-neck/assets/102405778/3a113731-2f3d-4be9-854b-3a92644c56da)
