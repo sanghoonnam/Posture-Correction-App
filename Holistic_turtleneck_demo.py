@@ -5,7 +5,6 @@ import modules.HolisticModule as hm
 from cptools.notify import mac_notify # 맥북용 알림
 import math
 import numpy as np
-from modules.sleep_detect import sleepiness_detection
 
 
 ###################################################
@@ -117,7 +116,7 @@ while True:
             turtle_neck_count = 0
 
         # 목길이, 임계치, 노트북과의 거리
-        print("Current ratio: {:.3f}, Init ratio : {:.3f}, Turtle neck count : {:.3f}".format(curr_ratio, init_ratio, turtle_neck_count))
+        print("Current ratio: {:.3f}, Init ratio : {:.3f}, Turtle neck count : {}".format(curr_ratio, init_ratio, turtle_neck_count))
 
         # 10번 거북목으로 인식되면 알림을 제공한다. 
         if init_ratio!=0 and curr_ratio < init_ratio*0.85 and turtle_neck_count > 15:
@@ -155,7 +154,7 @@ while True:
         sleep_count = 0
 
     
-    if sleep_count > 30:
+    if sleep_count > 20:
         # sleep_detection_toaster.show_toast("Sleepiness WARNING", f" \nPlease Stretch your body.\n")
         mac_notify(title='당신은 졸고 있습니다', text='스트레칭을 진행해주세요!!')
 
