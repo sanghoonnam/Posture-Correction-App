@@ -1,5 +1,5 @@
 import cv2
-# from win10toast import ToastNotifier
+# from win10toast import ToastNotifier # 윈도우용 알림
 from cptools.notify import mac_notify # 맥북용 알림
 
 import modules.HolisticModule as hm

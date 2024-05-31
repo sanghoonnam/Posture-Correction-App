@@ -249,8 +249,27 @@ class HolisticDetector():
 
         return cx, cy
 
+    def findFaceCenter(self, p1, p2):
+        x1, y1 = self.face_lmList[p1][1:3]
+        x2, y2 = self.face_lmList[p2][1:3]
+        cx, cy = (x1 + x2) // 2, (y1 + y2) // 2
+
+        return cx, cy
+    
     def findDistance(self, p1, p2, img, draw=True, r=15, t=3):
         x1, y1 = self.face_lmList[p1][1:3]
+        x2, y2 = p2[0],p2[1]
+
+        if draw:
+            cv2.line(img, (x1, y1), (x2, y2), (255,0,255), t)
+            cv2.circle(img, (x1, y1), r, (255,0,255), cv2.FILLED)
+            cv2.circle(img, (x2, y2), r, (255,0,255), cv2.FILLED)
+        length = math.hypot(x2-x1, y2-y1)
+
+        return length, img
+    
+    def findFaceDistance(self, p1, p2, img, draw=True, r=15, t=3):
+        x1, y1 = p1[0],p1[1]
         x2, y2 = p2[0],p2[1]
 
         if draw:

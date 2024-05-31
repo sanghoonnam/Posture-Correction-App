@@ -31,6 +31,28 @@ turtle_neck_count = 0
 # 목 길이 저장하는 array
 len_arr=np.array([])
 init_len=0
+init_eye_len=0
+init_neck_len=0
+
+import tkinter as tk
+from tkinter import messagebox
+
+def create_alert():
+    # 메인 윈도우 생성
+    root = tk.Tk()
+    root.withdraw()  # 메인 윈도우를 숨김
+
+    # 화면 크기와 메인 윈도우 크기를 구하여 화면 중앙에 위치시킴
+    screen_width = root.winfo_screenwidth()
+    screen_height = root.winfo_screenheight()
+    root.geometry(f'+{screen_width // 2}+{screen_height // 2}')
+
+    # 알림창 표시
+    messagebox.showinfo("알림", "가장 올바른 자세에서 s키를 눌러주세요!!")
+
+    # 이벤트 루프 종료
+    root.destroy()
+create_alert()
 
 while True:
     # defalut BGR img
@@ -53,41 +75,31 @@ while True:
         # 양 어깨 좌표 11번과 12번의 중심 좌표를 찾아 낸다.
         center_shoulder = detector.findCenter(11,12)
 
+        # 양쪽 눈 중심 좌표 찾아 낸다.
+        eye_1 = detector.findFaceCenter(159,145)
+        eye_2 = detector.findFaceCenter(386,374)
+
         # 목 길이 center_shoulder 좌표와 얼굴 152번(턱) 좌표를 사용하여 길이 구하는 부분
         # 목 길이가 표시된 이미지로 변경
         length, img = detector.findDistance(152, center_shoulder, img, draw=True)
 
+        # 양쪽 눈 사이의 길이 측정 및 이미지 표시
+        length_1, img = detector.findFaceDistance(eye_1, eye_2, img, draw=True)
+
         len_arr = np.append(len_arr,length)
         if len_arr.shape[0]>10:
             init_len = len_arr[-10:].mean()
-
-        # x, y, z좌표 예측 (노트북 웹캠과의 거리를 대강 예측) - 노트북과의 거리
-        pose_depth = abs(500 - detector.findDepth(11,12)) 
-        # print(detector.findDepth(11,12))
-        # if pose_depth < 200:
-        #     turtleneck_detect_threshold = 55
-        # else:
-        #     turtleneck_detect_threshold = 70
-
-        # turtleneck_detect_threshold = pose_depth / 4
-        # 노트북과의 거리는 0보다 커야한다.
-        if pose_depth > 0:
-            # 거북목 감지 임계치
-            turtleneck_detect_threshold = abs(math.log2(pose_depth)) * sensitivity
-        # 노트북과의 거리가 아주 가까운 상태
-        else:
-            turtleneck_detect_threshold = 50
         
+        # 웹캠이 켜진 화면에 내가 생각하는 이상적인 포즈인 순간에 s키를 누르면 길이가 측정되어 앞으로의 거북목 판단 근거가 된다.     
+        if cv2.waitKey(5) & 0xFF == ord('s'):
+            init_eye_len = detector.findFaceDistance(eye_1, eye_2, img, draw=True)[0]
+            init_neck_len = detector.findDistance(152, center_shoulder, img, draw=True)[0]
+        # print(f"neck:{length}, eyes:{length_1}, ratio:{length/length_1}")        
         # 핵심 로직 목 길이가 임계치보다 작을 때, 거북목으로 생각한다.
         if length < init_len*0.9:
             turtle_neck_count += 1
         # 목길이, 임계치, 노트북과의 거리
         print("Length : {:.3f},   Mean of length : {:.3f}, Turtle neck count : {:.3f}".format(length, init_len, turtle_neck_count))
-    
-
-        # 핵심 로직 목 길이가 임계치보다 작을 때, 거북목으로 생각한다.
-        # if length < turtleneck_detect_threshold:
-        #     turtle_neck_count += 1
 
         # 10번 거북목으로 인식되면 알림을 제공한다. 
         # if length < turtleneck_detect_threshold and turtle_neck_count > 10:
@@ -103,14 +115,6 @@ while True:
             # toaster.show_toast("TurtleNect WARNING", f"Keep your posture straight.\n\nDegree Of TurtleNeck = {tutleneck_score}")
             # 알림 제공 후 카운트를 다시 0으로 만든다.
             turtle_neck_count = 0
-
-    # fps 계산 로직
-    cTime = time.time()
-    fps = 1/(cTime-pTime)
-    pTime = cTime
-
-    # fps를 이미지 상단에 입력하는 로직
-    cv2.putText(img,str(int(fps)),(10,70), cv2.FONT_HERSHEY_PLAIN,3,(255,0,255),3)
 
     # img를 우리에게 보여주는 부분
     cv2.imshow("Image", img)
