@@ -5,9 +5,7 @@ from cptools.notify import mac_notify # 맥북용 알림
 import modules.HolisticModule as hm
 from modules.turtle_neck import turtlenect_detection
 from modules.eye_blink import eyeblink_detection
-from modules.sleep_detect_angle import sleepiness_detection
-
-from modules.fps import fps_present
+from modules.sleep_detect import sleepiness_detection
 
 import math
 
@@ -38,7 +36,6 @@ while True:
 
         sleepiness_detection(detector, img, log=True, notification=True)
         
-    fps_present(img, draw=True)
 
     # img를 우리에게 보여주는 부분
     cv2.imshow("Image", img)

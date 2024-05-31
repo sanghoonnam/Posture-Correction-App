@@ -5,15 +5,12 @@ import modules.HolisticModule as hm
 from cptools.notify import mac_notify # 맥북용 알림
 import math
 import numpy as np
+from modules.sleep_detect import sleepiness_detection
+
 
 ###################################################
 sensitivity = 8
 ###################################################
-
-# privious time for fps
-pTime = 0
-# cerrent time for fps
-cTime = 0
 
 # video input 
 # cap = cv2.VideoCapture(-1, cv2.CAP_ANY)
@@ -33,10 +30,15 @@ len_arr=np.array([])
 init_len=0
 init_eye_len=0
 init_neck_len=0
+init_ratio=0
+init_ratio_1=0
+init_ratio_2=0
+sleep_count=0
 
 import tkinter as tk
 from tkinter import messagebox
 
+# 사용자에게 보여주는 초기 알림창
 def create_alert():
     # 메인 윈도우 생성
     root = tk.Tk()
@@ -86,27 +88,42 @@ while True:
         # 양쪽 눈 사이의 길이 측정 및 이미지 표시
         length_1, img = detector.findFaceDistance(eye_1, eye_2, img, draw=True)
 
-        len_arr = np.append(len_arr,length)
-        if len_arr.shape[0]>10:
-            init_len = len_arr[-10:].mean()
-        
+        if length_1 != 0:
+            curr_ratio = length/length_1
+
         # 웹캠이 켜진 화면에 내가 생각하는 이상적인 포즈인 순간에 s키를 누르면 길이가 측정되어 앞으로의 거북목 판단 근거가 된다.     
         if cv2.waitKey(5) & 0xFF == ord('s'):
             init_eye_len = detector.findFaceDistance(eye_1, eye_2, img, draw=True)[0]
             init_neck_len = detector.findDistance(152, center_shoulder, img, draw=True)[0]
-        # print(f"neck:{length}, eyes:{length_1}, ratio:{length/length_1}")        
-        # 핵심 로직 목 길이가 임계치보다 작을 때, 거북목으로 생각한다.
-        if length < init_len*0.9:
+            init_ratio = init_neck_len / init_eye_len
+
+            x1, y1 = face_lmList[33][1:3]
+            x2, y2 = face_lmList[159][1:3]
+            x3, y3 = face_lmList[145][1:3] 
+            init_ratio_1 = math.sqrt(abs(y2-y3)**2 + abs(x2-x3)**2) / math.sqrt(abs(y2-y1)**2 + abs(x2-x1)**2)
+
+            x4, y4 = face_lmList[263][1:3]
+            x5, y5 = face_lmList[386][1:3]
+            x6, y6 = face_lmList[374][1:3] 
+        
+            init_ratio_2 = math.sqrt(abs(y5-y6)**2 + abs(x5-x6)**2) / math.sqrt(abs(y5-y4)**2 + abs(x5-x4)**2)
+        
+            
+        # 핵심 로직 목 길이와 눈 사이의 길이 비율이 정자세에서 측정한 경우 보다 작을 때, 거북목으로 생각한다.
+        if init_ratio!=0 and curr_ratio < init_ratio*0.85:
             turtle_neck_count += 1
+        
+        elif init_ratio!=0 and curr_ratio >= init_ratio*0.85:
+            turtle_neck_count = 0
+
         # 목길이, 임계치, 노트북과의 거리
-        print("Length : {:.3f},   Mean of length : {:.3f}, Turtle neck count : {:.3f}".format(length, init_len, turtle_neck_count))
+        print("Current ratio: {:.3f}, Init ratio : {:.3f}, Turtle neck count : {:.3f}".format(curr_ratio, init_ratio, turtle_neck_count))
 
         # 10번 거북목으로 인식되면 알림을 제공한다. 
-        # if length < turtleneck_detect_threshold and turtle_neck_count > 10:
-        if length < init_len*0.9 and turtle_neck_count > 10:
+        if init_ratio!=0 and curr_ratio < init_ratio*0.85 and turtle_neck_count > 15:
             # 얼마나 거북목인지 계산해주는 부분 (0~ 100 점) 
             # tutleneck_score = int((turtleneck_detect_threshold - int(length))/turtleneck_detect_threshold*100)
-            turtleneck_score = int((init_len - int(length))/init_len*100)
+            turtleneck_score = int((init_ratio - curr_ratio)/init_ratio*100)
             print("WARNING - Keep your posture straight.")
             print(f"TurtleNeck Score = {turtleneck_score}",)
             # win10toast 알림 제공
@@ -115,6 +132,38 @@ while True:
             # toaster.show_toast("TurtleNect WARNING", f"Keep your posture straight.\n\nDegree Of TurtleNeck = {tutleneck_score}")
             # 알림 제공 후 카운트를 다시 0으로 만든다.
             turtle_neck_count = 0
+
+    if len(face_lmList) != 0:
+        x1, y1 = face_lmList[33][1:3]
+        x2, y2 = face_lmList[159][1:3]
+        x3, y3 = face_lmList[145][1:3] 
+        
+        dist_1 = math.sqrt(abs(y2-y3)**2 + abs(x2-x3)**2) 
+        dist_2 = math.sqrt(abs(y2-y1)**2 + abs(x2-x1)**2) 
+
+        x4, y4 = face_lmList[263][1:3]
+        x5, y5 = face_lmList[386][1:3]
+        x6, y6 = face_lmList[374][1:3] 
+        
+        dist_3 = math.sqrt(abs(y5-y6)**2 + abs(x5-x6)**2) 
+        dist_4 = math.sqrt(abs(y5-y4)**2 + abs(x5-x4)**2) 
+        
+        
+    if dist_1/dist_2 < init_ratio_1*0.9 or dist_3/dist_4 < init_ratio_2*0.9:
+        sleep_count += 1
+    else:
+        sleep_count = 0
+
+    
+    if sleep_count > 30:
+        # sleep_detection_toaster.show_toast("Sleepiness WARNING", f" \nPlease Stretch your body.\n")
+        mac_notify(title='당신은 졸고 있습니다', text='스트레칭을 진행해주세요!!')
+
+        print("[ Sleepiness WARNING ] - Please Stretch your body")
+        sleep_count = 0
+
+    print("ratio : ({:.3f},{:.3f}), init_ratio : ({:.3f},{:.3f}),  sleep_count :{}".format(dist_1/dist_2,dist_3/dist_4,init_ratio_1,init_ratio_2, sleep_count))
+
 
     # img를 우리에게 보여주는 부분
     cv2.imshow("Image", img)
