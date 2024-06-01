@@ -33,6 +33,8 @@ init_ratio=0
 init_ratio_1=0
 init_ratio_2=0
 sleep_count=0
+unbalance_count=0
+init_grad=0
 
 import tkinter as tk
 from tkinter import messagebox
@@ -69,9 +71,6 @@ while True:
 
     # 인체가 감지가 되었는지 확인하는 구문
     if len(pose_lmList) != 0 and len(face_lmList) != 0:
-        # print("pose[11]", pose_lmList[11])
-        # print("pose[12]", pose_lmList[12])
-        # print("face[152]",face_lmList[152])
 
         # 양 어깨 좌표 11번과 12번의 중심 좌표를 찾아 낸다.
         center_shoulder = detector.findCenter(11,12)
@@ -106,7 +105,10 @@ while True:
             x6, y6 = face_lmList[374][1:3] 
         
             init_ratio_2 = math.sqrt(abs(y5-y6)**2 + abs(x5-x6)**2) / math.sqrt(abs(y5-y4)**2 + abs(x5-x4)**2)
-        
+
+            x11, y11 = pose_lmList[11][1:3]
+            x22, y22 = pose_lmList[12][1:3]
+            init_grad = (y22-y11)/(x22-x11)
             
         # 핵심 로직 목 길이와 눈 사이의 길이 비율이 정자세에서 측정한 경우 보다 작을 때, 거북목으로 생각한다.
         if init_ratio!=0 and curr_ratio < init_ratio*0.85:
@@ -119,7 +121,7 @@ while True:
         print("Current ratio: {:.3f}, Init ratio : {:.3f}, Turtle neck count : {}".format(curr_ratio, init_ratio, turtle_neck_count))
 
         # 10번 거북목으로 인식되면 알림을 제공한다. 
-        if init_ratio!=0 and curr_ratio < init_ratio*0.85 and turtle_neck_count > 15:
+        if init_ratio!=0 and curr_ratio < init_ratio*0.85 and turtle_neck_count > 20:
             # 얼마나 거북목인지 계산해주는 부분 (0~ 100 점) 
             # tutleneck_score = int((turtleneck_detect_threshold - int(length))/turtleneck_detect_threshold*100)
             turtleneck_score = int((init_ratio - curr_ratio)/init_ratio*100)
@@ -132,6 +134,7 @@ while True:
             # 알림 제공 후 카운트를 다시 0으로 만든다.
             turtle_neck_count = 0
 
+    # 졸음 탐지 기능 코드
     if len(face_lmList) != 0:
         x1, y1 = face_lmList[33][1:3]
         x2, y2 = face_lmList[159][1:3]
@@ -163,6 +166,27 @@ while True:
 
     print("ratio : ({:.3f},{:.3f}), init_ratio : ({:.3f},{:.3f}),  sleep_count :{}".format(dist_1/dist_2,dist_3/dist_4,init_ratio_1,init_ratio_2, sleep_count))
 
+    # 어깨 불균형 측정 코드
+    if len(face_lmList) != 0:
+        x11, y11 = pose_lmList[11][1:3]
+        x22, y22 = pose_lmList[12][1:3]
+        _, img = detector.findFaceDistance((x11,y11), (x22,y22), img, draw=True)
+        
+        grad_1 = (y22-y11)/(x22-x11)
+        
+    if abs(grad_1) > abs(init_grad) * 1.2 and init_grad!=0:
+        unbalance_count += 1
+    else:
+        unbalance_count = 0
+
+    
+    if unbalance_count > 30:
+        mac_notify(title='당신의 자세가 불균형합니다!', text='어깨에 힘을 빼고 편안하게 있어주세요!!')
+
+        print("[ Unbalanced Posture WARNING ] - Please Relax your body")
+        unbalance_count = 0
+
+    print("Current gradient : {:.3f}, init gradient : {:.3f},  unbalance_count :{}".format(grad_1,init_grad,unbalance_count))
 
     # img를 우리에게 보여주는 부분
     cv2.imshow("Image", img)
