@@ -34,7 +34,7 @@ init_ratio_1=0
 init_ratio_2=0
 sleep_count=0
 unbalance_count=0
-init_grad=0
+init_arctan=0
 
 import tkinter as tk
 from tkinter import messagebox
@@ -108,7 +108,7 @@ while True:
 
             x11, y11 = pose_lmList[11][1:3]
             x22, y22 = pose_lmList[12][1:3]
-            init_grad = (y22-y11)/(x22-x11)
+            init_arctan = math.atan((y22-y11)/(x22-x11))
             
         # 핵심 로직 목 길이와 눈 사이의 길이 비율이 정자세에서 측정한 경우 보다 작을 때, 거북목으로 생각한다.
         if init_ratio!=0 and curr_ratio < init_ratio*0.85:
@@ -172,21 +172,21 @@ while True:
         x22, y22 = pose_lmList[12][1:3]
         _, img = detector.findFaceDistance((x11,y11), (x22,y22), img, draw=True)
         
-        grad_1 = (y22-y11)/(x22-x11)
+        curr_arctan = math.atan((y22-y11)/(x22-x11))
         
-    if abs(grad_1) > abs(init_grad) * 2 and init_grad!=0:
+    if abs(curr_arctan - init_arctan) > 5 * 2 * math.pi / 360:
         unbalance_count += 1
     else:
         unbalance_count = 0
 
     
-    if unbalance_count > 30:
+    if unbalance_count > 20:
         mac_notify(title='당신의 자세가 불균형합니다!', text='어깨에 힘을 빼고 편안하게 있어주세요!!')
 
         print("[ Unbalanced Posture WARNING ] - Please Relax your body")
         unbalance_count = 0
 
-    print("Current gradient : {:.3f}, init gradient : {:.3f},  unbalance_count :{}".format(grad_1,init_grad,unbalance_count))
+    print("Current arctan : {:.3f}, init arctan : {:.3f},  unbalance_count :{}".format(curr_arctan,init_arctan,unbalance_count))
 
     # img를 우리에게 보여주는 부분
     cv2.imshow("Image", img)
