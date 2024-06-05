@@ -174,7 +174,7 @@ while True:
         
         grad_1 = (y22-y11)/(x22-x11)
         
-    if abs(grad_1) > abs(init_grad) * 1.2 and init_grad!=0:
+    if abs(grad_1) > abs(init_grad) * 2 and init_grad!=0:
         unbalance_count += 1
     else:
         unbalance_count = 0

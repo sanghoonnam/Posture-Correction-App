@@ -27,7 +27,9 @@ pip install -r requirements.txt
 ![image](https://user-images.githubusercontent.com/82289435/175852096-8e1364a2-3769-411e-a1c2-77a103df5e91.png)
 
 ### Turtleneck Detection
-![image](https://github.com/sanghoonnam/Prevent-Turtle-neck/assets/102405778/0f895390-ae86-47fc-aafc-af9bf4177b33)
+![image](https://github.com/sanghoonnam/Prevent-Turtle-neck/assets/102405778/5b421035-45e4-4202-8dfc-95e5968f59c3)
 
 ### mac_notify Notification
-![image](https://github.com/sanghoonnam/Prevent-Turtle-neck/assets/102405778/3a113731-2f3d-4be9-854b-3a92644c56da)
+![image](https://github.com/sanghoonnam/Prevent-Turtle-neck/assets/102405778/a7c9e522-7ed1-45c9-a951-8479a570e70e)
+![image](https://github.com/sanghoonnam/Prevent-Turtle-neck/assets/102405778/19be36a7-90ce-42d3-9a9f-53f27b94314b)
+![image](https://github.com/sanghoonnam/Prevent-Turtle-neck/assets/102405778/eb3622aa-6509-4792-a17b-e44fc6722b31)
