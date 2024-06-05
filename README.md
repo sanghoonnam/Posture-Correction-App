@@ -31,7 +31,7 @@ pip install -r requirements.txt
 ### Holistic(Hand, Pose, Face)
 ![image](https://user-images.githubusercontent.com/82289435/175852096-8e1364a2-3769-411e-a1c2-77a103df5e91.png)
 
-### Turtleneck Detection
+### Turtleneck Detection/Drowsiness Detection/Shoulder Imbalance Detection
 ![image](https://github.com/sanghoonnam/Prevent-Turtle-neck/assets/102405778/5b421035-45e4-4202-8dfc-95e5968f59c3)
 
 ### mac_notify Notification
