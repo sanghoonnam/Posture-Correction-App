@@ -151,7 +151,7 @@ while True:
         dist_4 = math.sqrt(abs(y5-y4)**2 + abs(x5-x4)**2) 
         
         
-    if dist_1/dist_2 < init_ratio_1*0.9 or dist_3/dist_4 < init_ratio_2*0.9:
+    if dist_1/dist_2 < init_ratio_1*0.85 or dist_3/dist_4 < init_ratio_2*0.85:
         sleep_count += 1
     else:
         sleep_count = 0
