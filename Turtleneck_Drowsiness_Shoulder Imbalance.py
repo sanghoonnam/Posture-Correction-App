@@ -1,5 +1,4 @@
 import cv2
-import time
 import modules.HolisticModule as hm
 # from win10toast import ToastNotifier # 윈도우용 알림
 from cptools.notify import mac_notify # 맥북용 알림
@@ -90,7 +89,7 @@ while True:
             curr_ratio = length/length_1
 
         # 웹캠이 켜진 화면에 내가 생각하는 이상적인 포즈인 순간에 s키를 누르면 길이가 측정되어 앞으로의 거북목 판단 근거가 된다.     
-        if cv2.waitKey(5) & 0xFF == ord('s'):
+        if cv2.waitKey(1) & 0xFF == ord('s'):
             init_eye_len = detector.findFaceDistance(eye_1, eye_2, img, draw=True)[0]
             init_neck_len = detector.findDistance(152, center_shoulder, img, draw=True)[0]
             init_ratio = init_neck_len / init_eye_len
@@ -130,7 +129,7 @@ while True:
             # win10toast 알림 제공
             print("TurtleNect WARNING", f"Keep your posture straight.\n\nDegree Of TurtleNeck = {turtleneck_score}")
             mac_notify(title='당신은 거북목입니다', text='자세를 고쳐주세요!!!')
-            # toaster.show_toast("TurtleNect WARNING", f"Keep your posture straight.\n\nDegree Of TurtleNeck = {tutleneck_score}")
+            # toaster.show_toast('당신은 거북목입니다', '자세를 고쳐주세요!!!')
             # 알림 제공 후 카운트를 다시 0으로 만든다.
             turtle_neck_count = 0
 
@@ -160,7 +159,7 @@ while True:
     if sleep_count > 20:
         # sleep_detection_toaster.show_toast("Sleepiness WARNING", f" \nPlease Stretch your body.\n")
         mac_notify(title='당신은 졸고 있습니다', text='스트레칭을 진행해주세요!!')
-
+        # toaster.show_toast('당신은 졸고 있습니다', '스트레칭을 진행해주세요!!')
         print("[ Sleepiness WARNING ] - Please Stretch your body")
         sleep_count = 0
 
@@ -182,7 +181,7 @@ while True:
     
     if unbalance_count > 20:
         mac_notify(title='당신의 자세가 불균형합니다!', text='어깨에 힘을 빼고 편안하게 있어주세요!!')
-
+        # toaster.show_toast('당신의 자세가 불균형합니다!', '어깨에 힘을 빼고 편안하게 있어주세요!!')
         print("[ Unbalanced Posture WARNING ] - Please Relax your body")
         unbalance_count = 0
 
@@ -197,4 +196,3 @@ while True:
 
 cap.release()
 cv2.destroyAllWindows()
-    
